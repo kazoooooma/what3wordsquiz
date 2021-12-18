@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<link rel="stylesheet" href="css/style.css">
+<title>what3words quiz</title>
+<script src="js/jquery-3.5.1.min.js"></script>
+<script
+  type="module"
+  src="https://cdn.what3words.com/javascript-components@4-latest/dist/what3words/what3words.esm.js"
+></script>
+<script
+  nomodule
+  src="https://cdn.what3words.com/javascript-components@4-latest/dist/what3words/what3words.js"
+></script>
+<!-- Google Map API -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC7YZiNujI-TQS85Q4xz3kStQb_58djmxQ"
+></script>
+
+</head>
+
+<body>
+
+  <div id="header">
+    <img src="./img/title.png" alt="" width="50%">
+  </div>
+
+  <div id="rules">
+      <p id="intro">世界中のあらゆる場所を3m四方に区分けし、それぞれ３つの単語で紐づけているサービス”what3words”を使ったゲームです</p>
+      <p id="ruletitle">ルール説明</p>
+      <p>
+        1. ゲームスタートのボタンを押すと、3つの画像が表示されます<br>
+        2. そこから連想される単語を、順番に下のwhat3wordsの検索欄に入力してください。単語の間は、”。”で区切ってください<br>
+        3. 検索結果で出た場所の名前を、回答欄に入力し、”答え合わせ”のボタンで正解を確認してみましょう
+      </p>
+  </div>
+
+  <button id="gamestart">ゲームスタート</button>
+  <div>
+    <img src="" alt="" id="image1" height="200px">
+    <img src="" alt="" id="image2" height="200px">
+    <img src="" alt="" id="image3" height="200px">
+  </div>
+
+  <div id="inputcontainer">
+    <input type="text" id="answerinput" placeholder="回答欄" >
+    <button id="readanswer">回答チェック</button>
+  </div>
+
+  <div id="answercontainer">
+    <p id="answer"></p>
+  </div>
+
+  <div id="searchtitle">
+    what3words検索欄
+  </div>
+
+    <div id="wrapper">
+      <what3words-autosuggest id="autosuggest" api_key="R18FWJIX">
+        <input type="text" />
+      </what3words-autosuggest>
+    <div id="map"></div>
+  </div>
+
+
+  <script>
+      // Google Mapの生成（初期値とズームの設定）
+      var map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: 35.67905845891927, lng: 139.76316927998778},
+        zoom: 14,
+        mapTypeId: 'roadmap'
+      });
+      
+      var markers = [];
+
+      const autosuggest = document.getElementById("autosuggest");
+      autosuggest.addEventListener("selected_suggestion", (value) => {
+        console.log("[EVENT:select]", value.detail.suggestion.words);
+
+        // Call the what3words convert to coordinates API to obtain the latitude and longitude of the three word address provided
+        what3words.api.convertToCoordinates(value.detail.suggestion.words).then((response) => {
+          console.log("[convertToCoordinates]", response);
+          if (response.coordinates) {
+            // Clear out the old markers.
+            markers.forEach((marker) => {
+            marker.setMap(null);
+            });
+            markers = [];
+
+            var latLng = { lat: response.coordinates.lat, lng: response.coordinates.lng };
+
+            // マップにマーカーを設定
+            var marker = new google.maps.Marker({
+              position: latLng, //
+              map: map,
+              title: value.detail.suggestion.words,
+            });
+            markers.push(marker);
+
+            // 指定された場所に地図を拡大
+            map.setCenter(latLng);
+            map.setZoom(18);
+          }
+        });
+      });
+
+      var gridData;
+
+// Add the what3words grid to the Google Map data layer once the desired zoom level is meet
+map.addListener('bounds_changed', function() {
+  const zoom = map.getZoom();
+  const loadFeatures = zoom > 17;
+
+  if (loadFeatures) { // Zoom level is high enough
+    var ne = map.getBounds().getNorthEast();
+    var sw = map.getBounds().getSouthWest();
+
+    // Call the what3words Grid API to obtain the grid squares within the current visble bounding box
+    what3words.api
+      .gridSectionGeoJson({
+        southwest: {
+          lat: sw.lat(), lng: sw.lng()
+        },
+        northeast: {
+          lat: ne.lat(), lng: ne.lng()
+        }
+      }).then(function(data) {
+        if (gridData !== undefined) {
+          for (var i = 0; i < gridData.length; i++) {
+              map.data.remove(gridData[i]);
+          }
+        }
+        gridData = map.data.addGeoJson(data);
+      }).catch(console.error);
+  }
+
+  // Set the grid display style
+  map.data.setStyle({
+    visible: loadFeatures,
+    strokeColor: '#777',
+    strokeWeight: 0.5,
+    clickable: false
+  });
+});
+
+$("#gamestart").on("click", function(){
+$("#image1").attr("src", "./img/imo.jpeg");
+$("#image2").attr("src", "./img/gakusei.jpeg");
+$("#image3").attr("src", "./img/meue.png");
+});
+
+$("#readanswer").on("click", function(){
+  let ans = $("#answerinput").val();
+  if(ans === "東京ドーム" || ans === "とうきょうどーむ" || ans === "tokyo dome"){
+    $("#answer").html("正解！");
+  }else{
+    $("#answer").html("不正解！<br>ヒント: さ○○○○。が○○○。め○○"); 
+  }
+});
+
+$("#answerinput").on("keydown", function(e){
+  if(e.keyCode === 13){
+  let ans = $("#answerinput").val();
+  if(ans === "東京ドーム" || ans === "とうきょうどーむ" || ans === "tokyo dome"){
+    $("#answer").html("正解！");
+  }else{
+  $("#answer").html("不正解！<br>ヒント: さ○○○○、が○○○、め○○"); 
+  }}
+    });
+
+</script>
+</body>
+
+<footer>
+  2021 copyright kazoooooma 
+</footer>
+
+</html>

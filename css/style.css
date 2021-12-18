@@ -1,0 +1,96 @@
+body {
+  margin-left: 3%;
+  margin-right: 3%;
+  padding: 0;
+  text-align: left;
+  font-size: 16px;
+}
+header {
+  background-color: darkblue;
+  border-bottom: 1px solid #ccc;
+  text-align: center;
+  color: #fff;
+}
+main {
+  border-bottom: 1px solid #ccc;
+}
+#header{
+   text-align: center;
+}
+#intro{
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+}
+#ruletitle{
+  margin-top: 40px;
+  font-weight: bold;
+}
+#searchtitle{
+  margin-top: 40px;
+  font-weight: bold;
+}
+#answerinput{
+  width: 200px;
+  height: 20px;
+}
+#gamestart{
+  width: 150px;
+  height: 40px;
+  background-color:seashell;
+  box-shadow: 0 5px 0 #aaaaaa;
+  transition: 0.1s;
+  border-color:grey;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+}
+#gamestart:hover {
+  transform: translateY(3px);
+  text-decoration: none;
+  box-shadow: 0 2px 0 #aaaaaa;
+}
+#readanswer{
+  width: 100px;
+  height: 30px;
+  background-color:seashell;
+  box-shadow: 0 3px 0 #aaaaaa;
+  transition: 0.1s;
+  border-color:grey;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+}
+#readanswer:hover {
+  transform: translateY(3px);
+  text-decoration: none;
+  box-shadow: 0 2px 0 #aaaaaa;
+}
+#inputcontainer{
+  margin-top: 20px;
+}
+#answercontainer{
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: darkred;
+}
+#autosuggest {
+  top: 9px;
+  left: 200px;
+  z-index: 100;
+}
+#wrapper {
+  height: 100%;
+} 
+#map {
+  height: 600px;
+  width: 100%;
+} 
+footer{
+  margin-top: 40px;
+  text-align: center;
+  width: 100%;
+  color: white;
+  background-color: lightslategrey;
+}
